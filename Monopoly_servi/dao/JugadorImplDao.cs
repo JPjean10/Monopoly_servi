@@ -30,8 +30,6 @@ public class JugadorImplDao : IJugadorInterfaz
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
-                // _ = NotificarWebSocket(_env["Urls:WebSocketInser"]);
-
                 string mensaje = resultado?.ToString() ?? "Jugador insertado correctamente.";
 
                 return new Response2<bool>(201, mensaje, true);
@@ -42,19 +40,5 @@ public class JugadorImplDao : IJugadorInterfaz
                 return new Response2<bool>(ex, ex.Number);
             }
         }
-
-    /*    public Task<Response2<bool>> InsertarJugador(JugadorModel jugador)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task NotificarWebSocket(string? url)
-        {
-            if (string.IsNullOrEmpty(url)) return;
-            try {
-                using var client = new HttpClient();
-                await client.PostAsync(url, new StringContent(""));
-            } catch (Exception e) { Console.WriteLine("Error notificando WebSocket: " + e.Message); }
-        }*/
     }
 }
