@@ -5,7 +5,7 @@ using Monopoly_servi.Models;
 namespace Monopoly_servi.Controllers
 {
     [ApiController]
-    [Route("Juagdor")]
+    [Route("Jugador")]
     public class JugadorControlador : Controller
     {
         private readonly IJugadorInterfaz _jugadorService;
@@ -17,7 +17,7 @@ namespace Monopoly_servi.Controllers
             _env = config;
         }
 
-        [HttpPost("insert")]
+        [HttpPost()]
         public async Task<IActionResult> InsertarJugador([FromBody] JugadorModel jugador)
         {
             var outResp = await _jugadorService.InsertarJugador(jugador);
