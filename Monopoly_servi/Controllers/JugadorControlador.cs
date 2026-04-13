@@ -23,5 +23,14 @@ namespace Monopoly_servi.Controllers
             var outResp = await _jugadorService.InsertarJugador(jugador);
             return StatusCode(outResp.StatusCode, outResp);
         }
+
+        [HttpGet()]
+        public async Task<IActionResult> ListarJugadores()
+        {
+            var response = await _jugadorService.ListarJugadores();
+
+            // Retornamos el StatusCode interno (ej. 200 o 500)
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

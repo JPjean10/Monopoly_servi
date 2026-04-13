@@ -5,9 +5,13 @@ namespace MonopolyService.Models
 {
     public class Response2<T>
     {
+        [JsonIgnore]
         public bool Status { get; set; }
         public string? UserMssg { get; set; }
+        // CAMBIO CLAVE: 'WhenWritingDefault' oculta el campo si es null o false (valor por defecto)
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public T? Data { get; set; }
+        [JsonIgnore]
         public string? ErrorId { get; set; }
         public int StatusCode { get; set; } // En .NET usamos int para el código HTTP
 
@@ -56,7 +60,11 @@ namespace MonopolyService.Models
             StatusCode = 200;
             UserMssg = "SUCCESS";
             Data = data;
-            Status = data != null;
+            // Si data es un bool y es false, Status es false. Si es objeto y es null, Status es false.
+            if (data is bool b)
+                Status = b;
+            else
+                Status = data != null;
         }
 
         // Constructor para errores específicos de BD (como el errorId_ 45000 en Java)

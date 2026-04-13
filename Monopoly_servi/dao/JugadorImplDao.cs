@@ -40,5 +40,40 @@ public class JugadorImplDao : IJugadorInterfaz
                 return new Response2<bool>(ex, ex.Number);
             }
         }
+
+        public async Task<Response2<List<JugadorModel>>> ListarJugadores()
+        {
+            try
+            {
+                var lista = new List<JugadorModel>();
+
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_ListarJugadores", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                await conn.OpenAsync();
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    // Creamos el jugador con su tarjeta anidada para guardar el monto
+                    lista.Add(new JugadorModel
+                    {
+                        JugadorId = reader.GetInt32(0),
+                        Nombre = reader.GetString(1),
+                        EsBanco = reader.GetBoolean(2),
+                        Tarjeta = new TarjetaModel
+                        {
+                            // reader.GetDouble(3) obtiene el monto de la tarjeta
+                            Monto = Convert.ToDouble(reader["monto"])
+                        }
+                    });
+                }
+                return new Response2<List<JugadorModel>>(lista);
+            }
+            catch (Exception ex) { return new Response2<List<JugadorModel>>(ex); }
+        }
     }
 }
