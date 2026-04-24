@@ -11,6 +11,7 @@ builder.Services.AddSignalR();
 
 // Add services to the container.
 builder.Services.AddScoped<IJugadorInterfaz, JugadorImplDao>();
+builder.Services.AddScoped<IPropiedadInterfaz, PropiedadImplDao>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger at https://aka.ms/aspnetcore/swashbuckle

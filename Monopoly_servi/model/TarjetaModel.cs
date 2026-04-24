@@ -4,7 +4,6 @@
     {
         public int TarjetaId { get; set; }
         public int JugadorId { get; set; }
-        public string? Codigo { get; set; }
-        public double Monto { get; set; }
+        public int Monto { get; set; }
     }
 }

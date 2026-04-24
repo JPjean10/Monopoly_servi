@@ -30,9 +30,7 @@ public class JugadorImplDao : IJugadorInterfaz
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
-                string mensaje = resultado?.ToString() ?? "Jugador insertado correctamente.";
-
-                return new Response2<bool>(201, mensaje, true);
+                return new Response2<bool>(201, resultado?.ToString() ?? "Jugador insertado correctamente.", true);
             }
             catch (SqlException ex)
             {
@@ -61,19 +59,42 @@ public class JugadorImplDao : IJugadorInterfaz
                     // Creamos el jugador con su tarjeta anidada para guardar el monto
                     lista.Add(new JugadorModel
                     {
-                        JugadorId = reader.GetInt32(0),
-                        Nombre = reader.GetString(1),
-                        EsBanco = reader.GetBoolean(2),
+                        JugadorId = reader.GetInt32(reader.GetOrdinal("jugador_id")),
+                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                        EsBanco = reader.GetBoolean(reader.GetOrdinal("es_banco")),
                         Tarjeta = new TarjetaModel
                         {
                             // reader.GetDouble(3) obtiene el monto de la tarjeta
-                            Monto = Convert.ToDouble(reader["monto"])
+                            Monto = reader.GetInt32(reader.GetOrdinal("monto")),
                         }
                     });
                 }
                 return new Response2<List<JugadorModel>>(lista);
             }
-            catch (Exception ex) { return new Response2<List<JugadorModel>>(ex); }
+            catch (Exception ex) { return new Response2<List<JugadorModel>>(ex); 
+            }
         }
+
+        public async Task<Response2<bool>> EliminarJugador(int jugadorId)
+        {
+            try 
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_EliminarJugador", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@in_jugador_id", jugadorId);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteScalarAsync();
+
+                return new Response2<bool>(200, "jugador eliminado exitosamente", true);
+            }
+            catch (SqlException ex)
+            {
+                return new Response2<bool>(ex, ex.Number);
+            }
+        }
+
     }
 }

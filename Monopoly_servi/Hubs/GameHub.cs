@@ -9,5 +9,9 @@ namespace Monopoly_servi.Hubs
         {
             await Clients.All.SendAsync("actulizar_lista_jugador");
         }
+        public async Task StartGame()
+        {
+            await Clients.All.SendAsync("partida_iniciada");
+        }
     }
 }

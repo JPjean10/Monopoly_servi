@@ -67,7 +67,6 @@ namespace MonopolyService.Models
                 Status = data != null;
         }
 
-        // Constructor para errores específicos de BD (como el errorId_ 45000 en Java)
         public Response2(Exception exception, int errorIdDb)
         {
             ErrorId = Guid.NewGuid().ToString().Substring(0, 8);
