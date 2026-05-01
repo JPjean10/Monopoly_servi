@@ -73,7 +73,7 @@ namespace MonopolyService.Models
             Status = false;
             ErrorMssg = $" | error: {exception.Message}";
 
-            if (errorIdDb == 50000)
+            if (errorIdDb == 50000 || errorIdDb == 50001)
             {
                 StatusCode = 401;
                 UserMssg = exception.InnerException?.Message ?? exception.Message;

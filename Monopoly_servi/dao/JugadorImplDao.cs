@@ -2,6 +2,7 @@
 using Monopoly_servi.interfaz;
 using Monopoly_servi.Models;
 using MonopolyService.Models;
+using System.Collections;
 using System.Data;
 
 namespace Monopoly_servi.dao
@@ -96,5 +97,42 @@ public class JugadorImplDao : IJugadorInterfaz
             }
         }
 
+        public async Task<Response2<List<JugadorModel>>> ObtenerJugadorPorId(int jugadorId)
+        {
+            try
+            {
+                var lista = new List<JugadorModel>();
+
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_ObtenerDetalleJugador", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@in_jugador_id", jugadorId);
+
+                await conn.OpenAsync();
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    // Creamos el jugador con su tarjeta anidada para guardar el monto
+                    lista.Add(new JugadorModel
+                    {
+                        JugadorId = reader.GetInt32(reader.GetOrdinal("jugador_id")),
+                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                        EsBanco = reader.GetBoolean(reader.GetOrdinal("es_banco")),
+                        Tarjeta = new TarjetaModel
+                        {
+                            // reader.GetDouble(3) obtiene el monto de la tarjeta
+                            Monto = reader.GetInt32(reader.GetOrdinal("monto")),
+                        }
+                    });
+                }
+                return new Response2<List<JugadorModel>>(lista);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<JugadorModel>>(ex);
+            }
+        }
     }
 }

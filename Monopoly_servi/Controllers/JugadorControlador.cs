@@ -55,5 +55,11 @@ namespace Monopoly_servi.Controllers
 
             return StatusCode(outResp.StatusCode, outResp);
          }
+        [HttpGet("buscar/{jugadorId}")]
+        public async Task<IActionResult> ObtenerJugadorPorId(int jugadorId) {
+            var response = await _jugadorService.ObtenerJugadorPorId(jugadorId);
+            // Retornamos el StatusCode interno (ej. 200 o 500)
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }
