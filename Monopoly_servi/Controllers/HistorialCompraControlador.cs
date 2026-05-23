@@ -27,6 +27,11 @@ namespace Monopoly_servi.Controllers
             var outResp = await _historialCompraService.InsertarHistorialCompra(historialCompra);
             return StatusCode(outResp.StatusCode, outResp);
         }
-
+        [HttpGet()]
+        public async Task<IActionResult> ListarHistorialCompras()
+        {
+            var response = await _historialCompraService.ListarHistorialCompras();
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

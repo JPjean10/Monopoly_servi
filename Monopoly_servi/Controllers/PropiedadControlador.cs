@@ -20,9 +20,9 @@ namespace Monopoly_servi.Controllers
             _hubContext = hubContext;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ListarPropiedades() {
-            var response = await _propiedadService.ListarPropiedades();
+        [HttpGet("{jugadorId}")]
+        public async Task<IActionResult> PropiededadXJugador(int jugadorId) {
+            var response = await _propiedadService.PropiededadXJugador(jugadorId);
             return StatusCode(response.StatusCode, response);
         }
     }

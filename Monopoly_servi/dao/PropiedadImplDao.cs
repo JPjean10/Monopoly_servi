@@ -18,15 +18,16 @@ namespace Monopoly_servi.dao
             _connectionString = config.GetConnectionString("DefaultConnection") ?? "";
         }
 
-        public async Task<Response2<List<PropiedadModel>>> ListarPropiedades()
+        public async Task<Response2<List<PropiedadModel>>> PropiededadXJugador(int PropiedadJugadorId)
         {
             try { 
                 var lista = new List<PropiedadModel>();
 
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("sp_ListarPropiedad", conn);
+                using var cmd = new SqlCommand("sp_PropiededadXJugador", conn);
 
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@in_jugador_id", PropiedadJugadorId);
 
                 await conn.OpenAsync();
 

@@ -41,5 +41,40 @@ namespace Monopoly_servi.dao
                 return new Response2<bool>(ex, ex.Number);
             }
         }
+
+        public async Task<Response2<List<HistorialCompraModel>>> ListarHistorialCompras()
+        {
+            try
+            {
+                var lista = new List<HistorialCompraModel>();
+
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_ListarHistorialCompra", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                await conn.OpenAsync();
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    // Creamos el jugador con su tarjeta anidada para guardar el monto
+                    lista.Add(new HistorialCompraModel
+                    {
+                        TipoCompra = reader["tipo_compra"].ToString() ?? "",
+                        Estado = reader["estado"].ToString() ?? "",
+                        NombreJugador = reader["nombre_jugador"].ToString() ?? "",
+                        NombrePropiedad = reader["nombre_propiedad"].ToString() ?? "",
+                        mensage = reader["mensage"].ToString() ?? ""
+                    });
+                }
+                return new Response2<List<HistorialCompraModel>>(lista);
+            }
+            catch(Exception ex)
+            {
+                return new Response2<List<HistorialCompraModel>>(ex);
+            }
+        }
     }
 }

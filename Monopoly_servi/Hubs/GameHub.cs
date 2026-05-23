@@ -25,3 +25,4 @@ namespace Monopoly_servi.Hubs
         }
     }
 }
+ 
