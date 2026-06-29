@@ -5,7 +5,6 @@ namespace MonopolyService.Models
 {
     public class Response2<T>
     {
-        [JsonIgnore]
         public bool Status { get; set; }
         public string? UserMssg { get; set; }
         // CAMBIO CLAVE: 'WhenWritingDefault' oculta el campo si es null o false (valor por defecto)

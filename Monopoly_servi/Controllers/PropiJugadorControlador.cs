@@ -71,7 +71,7 @@ namespace Monopoly_servi.Controllers
         {
             var outResp = await _propiJugadorService.VenderPropiedadesMasivo(request.JugadorId, request.PropiedadesIds);
 
-            if (outResp.StatusCode == 200)
+            if (outResp.StatusCode == 201)
             {
                 // Forzamos la actualización de saldos y pertenencias para todos los clientes en la partida
                 await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", request.JugadorId);

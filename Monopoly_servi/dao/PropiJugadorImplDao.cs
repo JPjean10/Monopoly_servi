@@ -118,15 +118,16 @@ namespace Monopoly_servi.dao
             try
             {
                 using var conn = new SqlConnection(_connectionString);
-                using var cmd = new SqlCommand("sp_HipotecarVenderPropiedades", conn);
+                using var cmd = new SqlCommand("sp_HipotecarPropiedades", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@JugadorId", jugadorId);
                 cmd.Parameters.AddWithValue("@PropiedadesIds", propiedadesIds);
 
                 await conn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
 
-                    return new Response2<int>(201, "hipoteca exotosa",true);
+                return new Response2<int>(201, "hipoteca exotosa",true);
             }
             catch (SqlException ex)
             {
