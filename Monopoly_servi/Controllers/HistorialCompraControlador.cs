@@ -25,6 +25,11 @@ namespace Monopoly_servi.Controllers
         public async Task<IActionResult> InsertarHistorialCompra([FromBody] HistorialCompraModel historialCompra)
         {
             var outResp = await _historialCompraService.InsertarHistorialCompra(historialCompra);
+            if (outResp.StatusCode == 201)
+            {
+                // Notificamos que los datos de la partida han cambiado, enviando el ID del comprador
+                await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", historialCompra.JugadorId);
+            }
             return StatusCode(outResp.StatusCode, outResp);
         }
         [HttpGet()]
