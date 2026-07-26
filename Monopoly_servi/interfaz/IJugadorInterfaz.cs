@@ -9,5 +9,7 @@ namespace Monopoly_servi.interfaz
         Task <Response2<List<JugadorModel>>> ListarJugadores();
         Task<Response2<bool>> EliminarJugador(int jugadorId);
         Task<Response2<List<JugadorModel>>> ObtenerJugadorPorId(int jugadorId);
+        Task<Response2<bool>> EjecutarAccionBanco(AccionBancoModel accionBanco);
+        Task<Response2<List<AccionBancoModel>>> ListarOpcionBanco();
     }
 }

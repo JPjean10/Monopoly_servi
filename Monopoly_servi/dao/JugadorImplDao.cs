@@ -134,5 +134,59 @@ public class JugadorImplDao : IJugadorInterfaz
                 return new Response2<List<JugadorModel>>(ex);
             }
         }
+
+        public async Task<Response2<bool>> EjecutarAccionBanco(AccionBancoModel accionBanco)
+        {
+            try
+            {
+                var lista = new List<JugadorModel>();
+
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_EjecutarAccionBanco", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure; 
+                cmd.Parameters.AddWithValue("@in_jugador_id", accionBanco.JugadorId);
+                cmd.Parameters.AddWithValue("@in_opcion_banco_id", accionBanco.OpcionBancoId);
+
+                await conn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
+
+                return new Response2<bool>(200, resultado?.ToString() ?? "Acción procesada correctamente.", true);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
+        }
+
+        public async Task<Response2<List<AccionBancoModel>>> ListarOpcionBanco()
+        {
+            try {
+                var lista = new List<AccionBancoModel>();
+
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_ListarOpcionBanco", conn);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                await conn.OpenAsync();
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    lista.Add(new AccionBancoModel
+                    {
+                        OpcionBancoId = reader.GetInt32(reader.GetOrdinal("opcion_banco_id")),
+                        Titulo = reader.GetString(reader.GetOrdinal("titulo"))
+                    });
+                }
+                return new Response2<List<AccionBancoModel>>(lista);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<AccionBancoModel>>(ex);
+            }
+        }
     }
 }

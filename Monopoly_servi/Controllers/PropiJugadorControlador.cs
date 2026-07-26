@@ -25,7 +25,7 @@ namespace Monopoly_servi.Controllers
         public async Task<IActionResult> ComprarPropiedad([FromBody] PropiJugadorModel propiJugador)
         {
             var outResp = await _propiJugadorService.ComprarPropiedad(propiJugador);
-            if (outResp.StatusCode == 201)
+            if (outResp.StatusCode == 201 || outResp.StatusCode == 401)
             {
                 // Notificamos que los datos de la partida han cambiado, enviando el ID del comprador
                 await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", propiJugador.JugadorId);
@@ -40,7 +40,7 @@ namespace Monopoly_servi.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPost("CobrarRenta")]
+        [HttpPost("cobrar-renta")]
         public async Task<IActionResult> CobrarRenta([FromBody] PropiJugadorModel propiJugador)
         {
             var outResp = await _propiJugadorService.CobrarRenta(propiJugador);
@@ -66,7 +66,7 @@ namespace Monopoly_servi.Controllers
             public string PropiedadesIds { get; set; } = string.Empty; // Cadena tipo "3,5,8"
         }
 
-        [HttpPost("VenderPropiedades")]
+        [HttpPost("vender-propiedades")]
         public async Task<IActionResult> VenderPropiedades([FromBody] VentaMasivaRequest request)
         {
             var outResp = await _propiJugadorService.VenderPropiedadesMasivo(request.JugadorId, request.PropiedadesIds);

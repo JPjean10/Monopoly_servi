@@ -61,5 +61,23 @@ namespace Monopoly_servi.Controllers
             // Retornamos el StatusCode interno (ej. 200 o 500)
             return StatusCode(response.StatusCode, response);
         }
+        [HttpPut]
+        public async Task<IActionResult> EjecutarAccionBanco([FromBody] AccionBancoModel accionBanco)
+        {
+            var outResp = await _jugadorService.EjecutarAccionBanco(accionBanco);
+            if (outResp.StatusCode == 200)
+            {
+                // Notificar a través del WebSocket que los datos del jugador han cambiado
+                await _hubContext.Clients.All.SendAsync("actualizar_datos_partida",0);
+            }
+            return StatusCode(outResp.StatusCode, outResp);
+        }
+        [HttpGet("listar-opcion-banco")]
+        public async Task<IActionResult> ListarOpcionBanco() 
+        {
+            var response = await _jugadorService.ListarOpcionBanco();
+
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }
