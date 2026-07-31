@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Data.SqlClient;
 using Monopoly_servi.Hubs;
 using Monopoly_servi.interfaz;
 using Monopoly_servi.Models;
+using MonopolyService.Models;
 
 namespace Monopoly_servi.Controllers
 {
@@ -22,62 +24,109 @@ namespace Monopoly_servi.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> InsertarJugador([FromBody] JugadorModel jugador)
+        public async Task<Response2<bool>> InsertarJugador([FromBody] JugadorModel jugador)
         {
-            var outResp = await _jugadorService.InsertarJugador(jugador);
-            if (outResp.StatusCode == 201)
+            try
             {
-                // Notificar a través del WebSocket que hay un nuevo jugador
+                var outResp = await _jugadorService.InsertarJugador(jugador);
+                // Notificar a través del WebSocket que los datos del jugador han cambiado
                 await _hubContext.Clients.All.SendAsync("actulizar_lista_jugador");
+                return new Response2<bool>(201, outResp, true);
             }
-            return StatusCode(outResp.StatusCode, outResp);
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
         }
 
         [HttpGet()]
-        public async Task<IActionResult> ListarJugadores()
+        public async Task<Response2<List<JugadorModel>>> ListarJugadores()
         {
-            var response = await _jugadorService.ListarJugadores();
-
-            // Retornamos el StatusCode interno (ej. 200 o 500)
-            return StatusCode(response.StatusCode, response);
+            try
+            {
+                var outResp = await _jugadorService.ListarJugadores();
+                return new Response2<List<JugadorModel>>(outResp);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<JugadorModel>>(ex);
+            }
         }
 
         [HttpDelete("{jugadorId}")]
-        public async Task<IActionResult> EliminarJugador(int jugadorId)
+        public async Task<Response2<bool>> EliminarJugador(int jugadorId)
         {
-            var outResp = await _jugadorService.EliminarJugador(jugadorId);
 
-            if (outResp.StatusCode == 200)
+            try
             {
-                // NOTIFICAMOS A TODOS que la lista cambió (alguien se fue o el banco cambió)
-                await _hubContext.Clients.All.SendAsync("actulizar_lista_jugador");
-            }
-
-            return StatusCode(outResp.StatusCode, outResp);
-         }
-        [HttpGet("buscar/{jugadorId}")]
-        public async Task<IActionResult> ObtenerJugadorPorId(int jugadorId) {
-            var response = await _jugadorService.ObtenerJugadorPorId(jugadorId);
-            // Retornamos el StatusCode interno (ej. 200 o 500)
-            return StatusCode(response.StatusCode, response);
-        }
-        [HttpPut]
-        public async Task<IActionResult> EjecutarAccionBanco([FromBody] AccionBancoModel accionBanco)
-        {
-            var outResp = await _jugadorService.EjecutarAccionBanco(accionBanco);
-            if (outResp.StatusCode == 200)
-            {
+                var outResp = await _jugadorService.EliminarJugador(jugadorId);
                 // Notificar a través del WebSocket que los datos del jugador han cambiado
-                await _hubContext.Clients.All.SendAsync("actualizar_datos_partida",0);
+                await _hubContext.Clients.All.SendAsync("actulizar_lista_jugador");
+                return new Response2<bool>(201, outResp, true);
             }
-            return StatusCode(outResp.StatusCode, outResp);
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
         }
-        [HttpGet("listar-opcion-banco")]
-        public async Task<IActionResult> ListarOpcionBanco() 
+        
+        [HttpGet("buscar/{jugadorId}")]
+        public async Task<Response2<List<JugadorModel>>> ObtenerJugadorPorId(int jugadorId) 
         {
-            var response = await _jugadorService.ListarOpcionBanco();
-
-            return StatusCode(response.StatusCode, response);
+            try
+            {
+                var outResp = await _jugadorService.ObtenerJugadorPorId(jugadorId);
+                return new Response2<List<JugadorModel>>(outResp);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<JugadorModel>>(ex);
+            }
+        }
+        
+        [HttpPut]
+        public async Task<Response2<bool>> EjecutarAccionBanco([FromBody] AccionBancoModel accionBanco)
+        {
+            try
+            {
+                String outResp = await _jugadorService.EjecutarAccionBanco(accionBanco);
+                    // Notificar a través del WebSocket que los datos del jugador han cambiado
+                    await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", 0);
+                return new Response2<bool>(200, outResp, true);
+            }
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
+        }
+        
+        [HttpGet("listar-opcion-banco")]
+        public async Task<Response2<List<AccionBancoModel>>> ListarOpcionBanco() 
+        {
+            try
+            {
+                var outResp = await _jugadorService.ListarOpcionBanco();
+                return new Response2<List<AccionBancoModel>>(outResp);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<AccionBancoModel>>(ex);
+            }
         }
     }
 }

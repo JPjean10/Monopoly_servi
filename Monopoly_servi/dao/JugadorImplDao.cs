@@ -18,10 +18,8 @@ public class JugadorImplDao : IJugadorInterfaz
             _connectionString = config.GetConnectionString("DefaultConnection") ?? "";
         }
 
-        public async Task<Response2<bool>> InsertarJugador(JugadorModel jugador)
+        public async Task<String> InsertarJugador(JugadorModel jugador)
         {
-            try
-            {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand("sp_InsertarJugador", conn);
 
@@ -31,19 +29,11 @@ public class JugadorImplDao : IJugadorInterfaz
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
-                return new Response2<bool>(201, resultado?.ToString() ?? "Jugador insertado correctamente.", true);
-            }
-            catch (SqlException ex)
-            {
-                // En C#, SqlState se maneja por Number o State
-                return new Response2<bool>(ex, ex.Number);
-            }
+               return resultado?.ToString() ?? "Jugador insertado correctamente.";
         }
 
-        public async Task<Response2<List<JugadorModel>>> ListarJugadores()
+        public async Task<List<JugadorModel>> ListarJugadores()
         {
-            try
-            {
                 var lista = new List<JugadorModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -70,16 +60,11 @@ public class JugadorImplDao : IJugadorInterfaz
                         }
                     });
                 }
-                return new Response2<List<JugadorModel>>(lista);
-            }
-            catch (Exception ex) { return new Response2<List<JugadorModel>>(ex); 
-            }
+            return lista;
         }
 
-        public async Task<Response2<bool>> EliminarJugador(int jugadorId)
+        public async Task<String> EliminarJugador(int jugadorId)
         {
-            try 
-            {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand("sp_EliminarJugador", conn);
 
@@ -89,18 +74,11 @@ public class JugadorImplDao : IJugadorInterfaz
                 await conn.OpenAsync();
                 await cmd.ExecuteScalarAsync();
 
-                return new Response2<bool>(200, "jugador eliminado exitosamente", true);
-            }
-            catch (SqlException ex)
-            {
-                return new Response2<bool>(ex, ex.Number);
-            }
+                return "Jugador eliminado correctamente.";
         }
 
-        public async Task<Response2<List<JugadorModel>>> ObtenerJugadorPorId(int jugadorId)
+        public async Task<List<JugadorModel>> ObtenerJugadorPorId(int jugadorId)
         {
-            try
-            {
                 var lista = new List<JugadorModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -127,18 +105,11 @@ public class JugadorImplDao : IJugadorInterfaz
                         }
                     });
                 }
-                return new Response2<List<JugadorModel>>(lista);
-            }
-            catch (Exception ex)
-            {
-                return new Response2<List<JugadorModel>>(ex);
-            }
+                return lista;
         }
 
-        public async Task<Response2<bool>> EjecutarAccionBanco(AccionBancoModel accionBanco)
+        public async Task<String> EjecutarAccionBanco(AccionBancoModel accionBanco)
         {
-            try
-            {
                 var lista = new List<JugadorModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -151,17 +122,11 @@ public class JugadorImplDao : IJugadorInterfaz
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
-                return new Response2<bool>(200, resultado?.ToString() ?? "Acción procesada correctamente.", true);
-            }
-            catch (Exception ex)
-            {
-                return new Response2<bool>(ex);
-            }
+                return resultado?.ToString() ?? "Acción procesada correctamente.";
         }
 
-        public async Task<Response2<List<AccionBancoModel>>> ListarOpcionBanco()
+        public async Task<List<AccionBancoModel>> ListarOpcionBanco()
         {
-            try {
                 var lista = new List<AccionBancoModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -181,12 +146,8 @@ public class JugadorImplDao : IJugadorInterfaz
                         Titulo = reader.GetString(reader.GetOrdinal("titulo"))
                     });
                 }
-                return new Response2<List<AccionBancoModel>>(lista);
-            }
-            catch (Exception ex)
-            {
-                return new Response2<List<AccionBancoModel>>(ex);
+                return lista;
             }
         }
-    }
+
 }

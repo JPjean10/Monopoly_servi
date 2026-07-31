@@ -5,11 +5,11 @@ namespace Monopoly_servi.interfaz
 {
     public interface IJugadorInterfaz
     {
-        Task<Response2<bool>> InsertarJugador(JugadorModel jugador);
-        Task <Response2<List<JugadorModel>>> ListarJugadores();
-        Task<Response2<bool>> EliminarJugador(int jugadorId);
-        Task<Response2<List<JugadorModel>>> ObtenerJugadorPorId(int jugadorId);
-        Task<Response2<bool>> EjecutarAccionBanco(AccionBancoModel accionBanco);
-        Task<Response2<List<AccionBancoModel>>> ListarOpcionBanco();
+        Task<String> InsertarJugador(JugadorModel jugador);
+        Task<List<JugadorModel>> ListarJugadores();
+        Task<String> EliminarJugador(int jugadorId);
+        Task<List<JugadorModel>> ObtenerJugadorPorId(int jugadorId);
+        Task<String> EjecutarAccionBanco(AccionBancoModel accionBanco);
+        Task<List<AccionBancoModel>> ListarOpcionBanco();
     }
 }
