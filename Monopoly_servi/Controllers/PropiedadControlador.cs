@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.SignalR;
 using Monopoly_servi.Hubs;
 using Monopoly_servi.interfaz;
+using Monopoly_servi.model;
+using Monopoly_servi.Models;
+using MonopolyService.Models;
 
 namespace Monopoly_servi.Controllers
 {
@@ -21,9 +24,17 @@ namespace Monopoly_servi.Controllers
         }
 
         [HttpGet("{jugadorId}")]
-        public async Task<IActionResult> PropiededadXJugador(int jugadorId) {
-            var response = await _propiedadService.PropiededadXJugador(jugadorId);
-            return StatusCode(response.StatusCode, response);
+        public async Task<Response2<List<PropiedadModel>>> PropiededadXJugador(int jugadorId) 
+        {
+            try
+            {
+                var outResp = await _propiedadService.PropiededadXJugador(jugadorId);
+                return new Response2<List<PropiedadModel>>(outResp);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<PropiedadModel>>(ex);
+            }
         }
     }
 }

@@ -18,9 +18,8 @@ namespace Monopoly_servi.dao
             _connectionString = config.GetConnectionString("DefaultConnection") ?? "";
         }
 
-        public async Task<Response2<List<PropiedadModel>>> PropiededadXJugador(int PropiedadJugadorId)
+        public async Task<List<PropiedadModel>> PropiededadXJugador(int PropiedadJugadorId)
         {
-            try { 
                 var lista = new List<PropiedadModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -43,9 +42,7 @@ namespace Monopoly_servi.dao
                         Direccion = reader.GetString(reader.GetOrdinal("direccion"))
                     });
                 }
-                return new Response2<List<PropiedadModel>>(lista);
-            } catch (Exception ex){ return new Response2<List<PropiedadModel>>(ex);
-            }
+                return lista;
         }
 
 
