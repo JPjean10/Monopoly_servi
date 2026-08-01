@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Data.SqlClient;
 using Monopoly_servi.Hubs;
 using Monopoly_servi.interfaz;
 using Monopoly_servi.model;
+using Monopoly_servi.Models;
+using MonopolyService.Models;
 
 namespace Monopoly_servi.Controllers
 {
@@ -22,62 +25,91 @@ namespace Monopoly_servi.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> ComprarPropiedad([FromBody] PropiJugadorModel propiJugador)
+        public async Task<Response2<bool>> ComprarPropiedad([FromBody] PropiJugadorModel propiJugador)
         {
-            var outResp = await _propiJugadorService.ComprarPropiedad(propiJugador);
-            if (outResp.StatusCode == 201 || outResp.StatusCode == 401)
+            try
             {
-                // Notificamos que los datos de la partida han cambiado, enviando el ID del comprador
+                var outResp = await _propiJugadorService.ComprarPropiedad(propiJugador);
+                // Notificar a través del WebSocket que los datos del jugador han cambiado
                 await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", propiJugador.JugadorId);
+                return new Response2<bool>(201, outResp, true);
             }
-            return StatusCode(outResp.StatusCode, outResp);
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
         }
         [HttpGet("{jugadorId}")]
-        public async Task<IActionResult> AlquilertXJugador(int jugadorId)
+        public async Task<Response2<List<PropiJugadorModel>>> AlquilertXJugador(int jugadorId)
         {
-            var response = await _propiJugadorService.AlquilertXJugador(jugadorId);
-            // Retornamos el StatusCode interno (ej. 200 o 500)
-            return StatusCode(response.StatusCode, response);
+
+            try
+            {
+                var outResp = await _propiJugadorService.AlquilertXJugador(jugadorId);
+                return new Response2<List<PropiJugadorModel>>(outResp);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<List<PropiJugadorModel>>(ex);
+            }
         }
 
         [HttpPost("cobrar-renta")]
-        public async Task<IActionResult> CobrarRenta([FromBody] PropiJugadorModel propiJugador)
+        public async Task<Response2<bool>> CobrarRenta([FromBody] PropiJugadorModel propiJugador)
         {
-            var outResp = await _propiJugadorService.CobrarRenta(propiJugador);
 
-            if (outResp.StatusCode == 201 && !string.IsNullOrEmpty(outResp.UserMssg))
+            try
             {
-                // Limpiamos el pipe '|' si la base de datos lo devolvió para no romper el mensaje de la UI
-                if (outResp.UserMssg.Contains("|"))
+                var outResp = await _propiJugadorService.CobrarRenta(propiJugador);
+
+                if (!string.IsNullOrEmpty(outResp))
                 {
-                    outResp.UserMssg = outResp.UserMssg.Split('|')[0];
+                    // Limpiamos el pipe '|' si la base de datos lo devolvió para no romper el mensaje de la UI
+                    if (outResp.Contains("|"))
+                    {
+                        outResp = outResp.Split('|')[0];
+                    }
+
+                    // Emitimos un único aviso global (0) a todos los conectados
+                    await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", 0);
                 }
-
-                // Emitimos un único aviso global (0) a todos los conectados
-                await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", 0);
+                return new Response2<bool>(201, outResp, true);
             }
-
-            return StatusCode(outResp.StatusCode, outResp);
-        }
-
-        public class VentaMasivaRequest
-        {
-            public int JugadorId { get; set; }
-            public string PropiedadesIds { get; set; } = string.Empty; // Cadena tipo "3,5,8"
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
         }
 
         [HttpPost("vender-propiedades")]
-        public async Task<IActionResult> VenderPropiedades([FromBody] VentaMasivaRequest request)
+        public async Task<Response2<bool>> VenderPropiedades([FromBody] VentaMasivaRequest request)
         {
-            var outResp = await _propiJugadorService.VenderPropiedadesMasivo(request.JugadorId, request.PropiedadesIds);
-
-            if (outResp.StatusCode == 201)
+            try
             {
-                // Forzamos la actualización de saldos y pertenencias para todos los clientes en la partida
+                await _propiJugadorService.VenderPropiedadesMasivo(request);
+                // Notificar a través del WebSocket que los datos del jugador han cambiado
                 await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", request.JugadorId);
+                return new Response2<bool>(201, "hipoteca exotosa", true);
             }
-
-            return StatusCode(outResp.StatusCode, outResp);
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
         }
     }
 }

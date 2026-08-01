@@ -17,10 +17,8 @@ namespace Monopoly_servi.dao
             _connectionString = config.GetConnectionString("DefaultConnection") ?? "";
         }
 
-        public async Task<Response2<bool>> ComprarPropiedad(PropiJugadorModel propiJugador)
+        public async Task<String> ComprarPropiedad(PropiJugadorModel propiJugador)
         {
-            try
-            {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand("sp_Comprar", conn);
 
@@ -31,20 +29,11 @@ namespace Monopoly_servi.dao
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
-                return new Response2<bool>(201, resultado?.ToString() ?? "Compra Exitosa.", true);
-            }
-            catch (SqlException ex)
-            {
-                // En C#, SqlState se maneja por Number o State
-                return new Response2<bool>(ex, ex.Number);
-            }
+                return resultado?.ToString() ?? "Compra Exitosa.";
         }
 
-        public async Task<Response2<List<PropiJugadorModel>>> AlquilertXJugador(int PropiedadJugadorId)
+        public async Task<List<PropiJugadorModel>> AlquilertXJugador(int PropiedadJugadorId)
         {
-            try
-            {
-
                 var lista = new List<PropiJugadorModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -70,17 +59,10 @@ namespace Monopoly_servi.dao
                         }
                     });
                 }
-                return new Response2<List<PropiJugadorModel>>(lista);
-            }
-            catch (Exception ex)
-            {
-                return new Response2<List<PropiJugadorModel>>(ex);
-            }
+                return lista;
         }
-        public async Task<Response2<bool>> CobrarRenta(PropiJugadorModel propiJugador)
+        public async Task<String> CobrarRenta(PropiJugadorModel propiJugador)
         {
-            try
-            {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand("sp_CobrarRenta", conn);
 
@@ -90,49 +72,22 @@ namespace Monopoly_servi.dao
                 cmd.Parameters.AddWithValue("@Nivel", propiJugador.NivelActual);
 
                 await conn.OpenAsync();
+                var resultado = await cmd.ExecuteScalarAsync();
 
-                using var reader = await cmd.ExecuteReaderAsync();
-                if (await reader.ReadAsync())
-                {
-                    string message = reader.GetString(reader.GetOrdinal("Message"));
-                    int cobradorId = reader.GetInt32(reader.GetOrdinal("CobradorRealId"));
-
-                    // Concatenamos el mensaje limpio con el ID usando un separador '|'
-                    // Esto produce por ejemplo: "Renta cobrada exitosamente.|2"
-                    string dataCombinada = $"{message}|{cobradorId}";
-
-                    return new Response2<bool>(201, dataCombinada, true);
-                }
-
-                return new Response2<bool>(500, "No se recibió respuesta de la base de datos.", false);
-            }
-            catch (SqlException ex)
-            {
-                // Esto captura los THROW 50000 que pusiste en el SQL
-                return new Response2<bool>(ex, ex.Number);
-            }
+                return resultado?.ToString();
         }
 
-        public async Task<Response2<int>> VenderPropiedadesMasivo(int jugadorId, string propiedadesIds)
+        public async Task VenderPropiedadesMasivo(VentaMasivaRequest request)
         {
-            try
-            {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand("sp_HipotecarPropiedades", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@JugadorId", jugadorId);
-                cmd.Parameters.AddWithValue("@PropiedadesIds", propiedadesIds);
+                cmd.Parameters.AddWithValue("@JugadorId", request.JugadorId);
+                cmd.Parameters.AddWithValue("@PropiedadesIds", request.PropiedadesIds);
 
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
-
-                return new Response2<int>(201, "hipoteca exotosa",true);
-            }
-            catch (SqlException ex)
-            {
-                return new Response2<int>(ex, ex.Number);
-            }
         }
     }
 }

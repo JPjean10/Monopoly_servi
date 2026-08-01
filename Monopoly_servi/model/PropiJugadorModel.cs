@@ -10,4 +10,10 @@
         public int Renta { get; set; }
         public PropiedadModel? Propiedad { get; set; }
     }
+
+    public class VentaMasivaRequest
+    {
+        public int JugadorId { get; set; }
+        public string PropiedadesIds { get; set; } = string.Empty; // Cadena tipo "3,5,8"
+    }
 }
