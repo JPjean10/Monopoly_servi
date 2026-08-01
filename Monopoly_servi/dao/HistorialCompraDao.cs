@@ -17,10 +17,8 @@ namespace Monopoly_servi.dao
             _connectionString = config.GetConnectionString("DefaultConnection") ?? "";
         }
 
-        public async Task<Response2<bool>> InsertarHistorialCompra(HistorialCompraModel historialCompra)
+        public async Task<String> InsertarHistorialCompra(HistorialCompraModel historialCompra)
         {
-            try
-            {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand("sp_InsertarHistorialCompra", conn);
 
@@ -33,19 +31,11 @@ namespace Monopoly_servi.dao
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
-                return new Response2<bool>(201, resultado?.ToString() ?? "historial insertado correctamente.", true);
-            }
-            catch (SqlException ex)
-            {
-                // En C#, SqlState se maneja por Number o State
-                return new Response2<bool>(ex, ex.Number);
-            }
+                return resultado?.ToString() ?? "historial insertado correctamente.";
         }
 
-        public async Task<Response2<List<HistorialCompraModel>>> ListarHistorialCompras()
+        public async Task<List<HistorialCompraModel>> ListarHistorialCompras()
         {
-            try
-            {
                 var lista = new List<HistorialCompraModel>();
 
                 using var conn = new SqlConnection(_connectionString);
@@ -69,12 +59,7 @@ namespace Monopoly_servi.dao
                         mensage = reader["mensage"].ToString() ?? ""
                     });
                 }
-                return new Response2<List<HistorialCompraModel>>(lista);
-            }
-            catch(Exception ex)
-            {
-                return new Response2<List<HistorialCompraModel>>(ex);
-            }
+                return lista;
         }
     }
 }
