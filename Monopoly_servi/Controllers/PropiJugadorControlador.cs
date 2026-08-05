@@ -25,11 +25,11 @@ namespace Monopoly_servi.Controllers
         }
 
         [HttpPost()]
-        public async Task<Response2<bool>> ComprarPropiedad([FromBody] PropiJugadorModel propiJugador)
+        public async Task<Response2<bool>> AdquirirOMejorarPropiedad([FromBody] PropiJugadorModel propiJugador)
         {
             try
             {
-                var outResp = await _propiJugadorService.ComprarPropiedad(propiJugador);
+                var outResp = await _propiJugadorService.AdquirirOMejorarPropiedad(propiJugador);
                 // Notificar a través del WebSocket que los datos del jugador han cambiado
                 await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", propiJugador.JugadorId);
                 return new Response2<bool>(201, outResp, true);

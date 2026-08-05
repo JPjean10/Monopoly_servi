@@ -14,6 +14,7 @@ builder.Services.AddScoped<IJugadorInterfaz, JugadorImplDao>();
 builder.Services.AddScoped<IPropiedadInterfaz, PropiedadImplDao>();
 builder.Services.AddScoped<IHistorialCompraInterfaz, HistorialCompraDao>();
 builder.Services.AddScoped<IPropiJugadorInterfaz, PropiJugadorImplDao>();
+builder.Services.AddScoped<ICartaTrampaInterfaz, CartaTrampaImplDao>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger at https://aka.ms/aspnetcore/swashbuckle
