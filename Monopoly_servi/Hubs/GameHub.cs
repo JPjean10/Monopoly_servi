@@ -13,7 +13,7 @@ namespace Monopoly_servi.Hubs
         {
             await Clients.All.SendAsync("partida_iniciada");
         }
-        public async Task EnviarSolicitudCompra(int jugadorId, int propiedadId, string nombreJugador,string mensajeSolicitud)
+        public async Task EnviarSolicitudCompra(int jugadorId, int propiedadId, string nombreJugador, string mensajeSolicitud)
         {
             // Notifica a todos (o solo al Banco si tienes grupos) que hay una nueva solicitud
             await Clients.All.SendAsync("nueva_solicitud_compra", jugadorId, propiedadId, nombreJugador, mensajeSolicitud);

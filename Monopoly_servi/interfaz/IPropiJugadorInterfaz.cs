@@ -9,6 +9,6 @@ namespace Monopoly_servi.interfaz
         Task<List<PropiJugadorModel>> AlquilertXJugador(int PropiedadJugadorId);
         Task<String> CobrarRenta(PropiJugadorModel propiJugador);
         Task VenderPropiedadesMasivo(VentaMasivaRequest request);
-
+        Task<String> ProcesarSubasta(PropiJugadorModel propiJugador);
     }
 }

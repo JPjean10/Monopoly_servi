@@ -32,7 +32,7 @@ namespace Monopoly_servi.dao
             {
                 lista.Add(new CartaTrampaModel
                 {
-                    carta_id = reader.GetInt32(reader.GetOrdinal("carta_id")),
+                    CartaId = reader.GetInt32(reader.GetOrdinal("carta_id")),
                     titulo = reader.GetString(reader.GetOrdinal("titulo")),
                     descripcion = reader.GetString(reader.GetOrdinal("descripcion")),
                     monto = reader.IsDBNull("monto") ? null : reader.GetInt32("monto"),

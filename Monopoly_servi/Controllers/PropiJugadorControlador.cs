@@ -111,5 +111,25 @@ namespace Monopoly_servi.Controllers
                 return new Response2<bool>(ex);
             }
         }
+        [HttpPost("subasta-propiedad")]
+        public async Task<Response2<bool>> ProcesarSubasta([FromBody] PropiJugadorModel propiJugador)
+        {
+            try
+            {
+                var outResp = await _propiJugadorService.ProcesarSubasta(propiJugador);
+                // Notificar a través del WebSocket que los datos del jugador han cambiado
+                await _hubContext.Clients.All.SendAsync("actualizar_datos_partida", propiJugador.JugadorId);
+                return new Response2<bool>(201, outResp, true);
+            }
+            catch (SqlException ex)
+            {
+                // AQUÍ pasamos ex.Number para que identifique el 50000 y asigne 401
+                return new Response2<bool>(ex, ex.Number);
+            }
+            catch (Exception ex)
+            {
+                return new Response2<bool>(ex);
+            }
+        }
     }
 }

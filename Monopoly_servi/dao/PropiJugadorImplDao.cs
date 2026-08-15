@@ -89,5 +89,21 @@ namespace Monopoly_servi.dao
                 await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
         }
+        public async Task<String> ProcesarSubasta(PropiJugadorModel propiJugador)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("sp_ProcesarSubasta", conn);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@in_jugador_id", propiJugador.JugadorId);
+            cmd.Parameters.AddWithValue("@in_propiedad_id", propiJugador.PropiedadId);
+            cmd.Parameters.AddWithValue("@in_monto_subasta", propiJugador.Propiedad.Precio);
+
+            await conn.OpenAsync();
+            var resultado = await cmd.ExecuteScalarAsync();
+
+            return resultado?.ToString() ?? "Compra Exitosa.";
+        }
+
     }
 }
