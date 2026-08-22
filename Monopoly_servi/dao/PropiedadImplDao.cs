@@ -18,7 +18,7 @@ namespace Monopoly_servi.dao
             _connectionString = config.GetConnectionString("DefaultConnection") ?? "";
         }
 
-        public async Task<List<PropiedadModel>> PropiededadXJugador(int PropiedadJugadorId)
+        public async Task<List<PropiedadModel>> PropiededadXJugador(int PropiedadJugadorId, int descuento)
         {
                 var lista = new List<PropiedadModel>();
 
@@ -27,6 +27,7 @@ namespace Monopoly_servi.dao
 
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@in_jugador_id", PropiedadJugadorId);
+            cmd.Parameters.AddWithValue("@in_descuento", descuento);
 
                 await conn.OpenAsync();
 
@@ -39,6 +40,7 @@ namespace Monopoly_servi.dao
                         PropiedadId = reader.GetInt32(reader.GetOrdinal("propiedad_id")),
                         Nombre = reader.GetString(reader.GetOrdinal("nombre")),
                         Precio = reader.GetInt32(reader.GetOrdinal("precio")),
+                        precio_descuento = reader.GetInt32(reader.GetOrdinal("precio_descuento")),
                         Direccion = reader.GetString(reader.GetOrdinal("direccion"))
                     });
                 }

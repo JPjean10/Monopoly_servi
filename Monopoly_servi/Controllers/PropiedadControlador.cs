@@ -24,11 +24,11 @@ namespace Monopoly_servi.Controllers
         }
 
         [HttpGet("{jugadorId}")]
-        public async Task<Response2<List<PropiedadModel>>> PropiededadXJugador(int jugadorId) 
+        public async Task<Response2<List<PropiedadModel>>> PropiededadXJugador(int jugadorId, [FromQuery(Name = "dec")] int descuento)
         {
             try
             {
-                var outResp = await _propiedadService.PropiededadXJugador(jugadorId);
+                var outResp = await _propiedadService.PropiededadXJugador(jugadorId, descuento);
                 return new Response2<List<PropiedadModel>>(outResp);
             }
             catch (Exception ex)

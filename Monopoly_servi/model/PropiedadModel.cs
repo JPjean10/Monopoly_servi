@@ -5,6 +5,7 @@
         public int PropiedadId { get; set; }
         public string? Nombre { get; set; }
         public int Precio { get; set; }
+        public int precio_descuento { get; set; }
         public string? Direccion { get; set; }
     }
 }

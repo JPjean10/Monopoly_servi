@@ -5,6 +5,6 @@ namespace Monopoly_servi.interfaz
 {
     public interface IPropiedadInterfaz
     {
-        Task<List<PropiedadModel>> PropiededadXJugador(int PropiedadJugadorId);
+        Task<List<PropiedadModel>> PropiededadXJugador(int PropiedadJugadorId, int descuento);
     }
 }

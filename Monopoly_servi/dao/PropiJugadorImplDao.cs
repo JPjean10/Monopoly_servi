@@ -25,8 +25,9 @@ namespace Monopoly_servi.dao
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@in_jugador_id", propiJugador.JugadorId);
                 cmd.Parameters.AddWithValue("@in_propiedad_id", propiJugador.PropiedadId);
+                cmd.Parameters.AddWithValue("@in_descuento", propiJugador.Propiedad.precio_descuento);
 
-                await conn.OpenAsync();
+            await conn.OpenAsync();
                 var resultado = await cmd.ExecuteScalarAsync();
 
                 return resultado?.ToString() ?? "Compra Exitosa.";
