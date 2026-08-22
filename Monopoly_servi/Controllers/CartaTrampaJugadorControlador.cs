@@ -58,13 +58,13 @@ namespace Monopoly_servi.Controllers
             }
         }
 
-        [HttpPost("procesar-inventario")]
+        [HttpDelete]
         public async Task<Response2<bool>> ProcesarCartaInventarioJugador([FromBody]  CartaTrampaJugadorModel cartaTrampaJugadorModel)
         {
             try
             {
                 var outResp = await _cartaTrampaJugadorService.ProcesarCartaInventarioJugador(cartaTrampaJugadorModel);
-                return new Response2<bool>(200, outResp, true);
+                return new Response2<bool>(201, outResp, true);
             }
             catch (SqlException ex)
             {
